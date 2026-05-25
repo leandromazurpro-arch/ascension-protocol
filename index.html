@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>⚔ Ascension Protocol</title>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#0d0d1a"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon.svg"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%230d0d1a'/><text y='.85em' font-size='80' x='10'>⚔</text></svg>"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -347,6 +351,18 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <div id="rankRewards"></div>
   <button class="btn btn-primary btn-sm" onclick="saveSettings()">Enregistrer les récompenses</button>
 
+  <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:18px 0 11px;padding-bottom:6px;border-bottom:1px solid var(--border);">🔔 Notifications</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6;">Active les rappels automatiques aux heures clés de la journée. Pour les avoir en arrière-plan sur Android, ajoute le site à l'écran d'accueil.</div>
+  <div id="notifStatus" style="font-size:13px;padding:10px;border-radius:8px;background:var(--card2);margin-bottom:10px;text-align:center;">Chargement...</div>
+  <button class="btn btn-primary btn-full" id="notifBtn" onclick="requestNotifPermission()">🔔 Activer les notifications</button>
+  <div style="margin-top:10px;font-size:11px;color:var(--muted);">Rappels prévus :</div>
+  <div style="font-size:12px;color:var(--text);margin-top:6px;line-height:1.8;">
+    🌅 <strong>08:30</strong> — Quête du matin<br>
+    🧠 <strong>12:00</strong> — Point de mi-journée<br>
+    ⚡ <strong>18:00</strong> — Fenêtre de mission<br>
+    📋 <strong>21:30</strong> — Check-in du soir
+  </div>
+
   <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:18px 0 11px;padding-bottom:6px;border-bottom:1px solid var(--border);">Données</div>
   <button class="btn btn-outline btn-full" onclick="exportData()">📤 Exporter (JSON)</button>
   <button class="btn btn-outline btn-full" style="margin-top:7px;" onclick="document.getElementById('impFile').click()">📥 Importer</button>
@@ -467,10 +483,13 @@ const DEFAULT_DAILY=[
   {id:'d17',text:'Travailler sur quelque chose d\'important', xp:40, stat:'ressources',tier:'hard'},
 ];
 const DEFAULT_WEEKLY=[
-  {id:'w1',text:'Faire du sport au moins 3 fois',       xp:100,stat:'force'},
-  {id:'w2',text:'Terminer 1 chose commencée (même petite)', xp:80, stat:'creation'},
-  {id:'w3',text:'Apprendre quelque chose et le noter', xp:70, stat:'savoir'},
-  {id:'w4',text:'Faire 1 tâche productive évitée',     xp:90, stat:'ressources'},
+  {id:'w1',text:'Faire du sport au moins 3 fois dans la semaine',     xp:100,stat:'force'},
+  {id:'w2',text:'Terminer 1 chose commencée (même petite)',           xp:80, stat:'creation'},
+  {id:'w3',text:'Apprendre quelque chose de nouveau et le noter',     xp:70, stat:'savoir'},
+  {id:'w4',text:'Faire 1 tâche productive que tu aurais reportée',    xp:90, stat:'ressources'},
+  {id:'w5',text:'🏃 30 min de sport (course, salle, peu importe)',    xp:80, stat:'force'},
+  {id:'w6',text:'📖 Lire 20 min minimum (vrai livre ou article)',     xp:60, stat:'savoir'},
+  {id:'w7',text:'📝 45 min de devoirs/travail sérieux sans distraction', xp:90, stat:'ressources'},
 ];
 const TITLES_DEF=[
   {id:'t1',n:'Éveillé',    d:"Compléter le premier check-in",                 i:'🌅'},
@@ -879,10 +898,97 @@ function updateReminderBar(){
 }
 setInterval(updateReminderBar,30000);
 
+// ===== SERVICE WORKER & NOTIFICATIONS =====
+let swReg = null;
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/ascension-protocol/sw.js', { scope: '/ascension-protocol/' })
+    .then(r => { swReg = r; })
+    .catch(() => {});
+}
+
+const NOTIF_SCHEDULE = [
+  { h:8,  m:30, title:'⚔️ Quête du matin disponible', body:"Tu t'éveilles. Lance ta première mission." },
+  { h:12, m:0,  title:'🧠 Point de mi-journée',        body:"Qu'est-ce que tu as accompli ce matin ?" },
+  { h:18, m:0,  title:'⚡ Fenêtre de mission ouverte', body:'3h pour agir avant le check-in du soir.' },
+  { h:21, m:30, title:'📋 Check-in du soir',           body:'5 minutes. Ferme la boucle de la journée. +10 XP' },
+];
+
+function scheduleNotifs() {
+  if (Notification.permission !== 'granted') return;
+  const now = new Date();
+  NOTIF_SCHEDULE.forEach(s => {
+    const target = new Date();
+    target.setHours(s.h, s.m, 0, 0);
+    const delay = target - now;
+    if (delay <= 0) return;
+    // Via SW si dispo (survive en arrière-plan sur Android)
+    if (swReg && swReg.active) {
+      swReg.active.postMessage({ type:'SCHEDULE_NOTIF', title:s.title, body:s.body, delay });
+    } else {
+      // Fallback direct (page doit rester ouverte)
+      setTimeout(() => {
+        if (Notification.permission === 'granted')
+          new Notification(s.title, { body:s.body, icon:'/ascension-protocol/icon.svg' });
+      }, delay);
+    }
+  });
+}
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    updateNotifStatus('❌ Ton navigateur ne supporte pas les notifications.', '#ef5350');
+    return;
+  }
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') {
+      scheduleNotifs();
+      updateNotifStatus('✅ Notifications activées! Rappels programmés pour aujourd\'hui.', '#66bb6a');
+      toast('🔔 Notifications activées!', 'success');
+    } else if (perm === 'denied') {
+      updateNotifStatus('❌ Permission refusée. Autorise dans les paramètres du navigateur.', '#ef5350');
+    } else {
+      updateNotifStatus('⚠️ Permission ignorée. Clique à nouveau pour activer.', '#ffa726');
+    }
+  });
+}
+
+function updateNotifStatus(msg, color) {
+  const el = document.getElementById('notifStatus');
+  const btn = document.getElementById('notifBtn');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color || '';
+  if (color === '#66bb6a' && btn) {
+    btn.textContent = '✅ Notifications activées';
+    btn.disabled = true;
+    btn.style.opacity = '.6';
+  }
+}
+
+function checkNotifStatus() {
+  if (!('Notification' in window)) {
+    updateNotifStatus('❌ Navigateur non compatible.', '#ef5350');
+    return;
+  }
+  const p = Notification.permission;
+  if (p === 'granted') {
+    updateNotifStatus('✅ Notifications activées — rappels programmés.', '#66bb6a');
+    const btn = document.getElementById('notifBtn');
+    if (btn) { btn.textContent='✅ Activées';btn.disabled=true;btn.style.opacity='.6'; }
+    scheduleNotifs();
+  } else if (p === 'denied') {
+    updateNotifStatus('❌ Bloquées. Active-les dans les paramètres du navigateur.', '#ef5350');
+  } else {
+    updateNotifStatus('⏸ Non activées. Clique le bouton pour recevoir les rappels.', '#ffa726');
+  }
+}
+
 // ===== INIT =====
 checkResets();renderAll();renderPom();renderMood();updateReminderBar();
 const nbDl=document.getElementById('nbDeadline');
 if(nbDl){const d=new Date();d.setDate(d.getDate()+14);nbDl.value=d.toISOString().slice(0,10);}
+setTimeout(checkNotifStatus, 500);
 </script>
 </body>
 </html>
