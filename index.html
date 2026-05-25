@@ -137,6 +137,34 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 /* CHECKIN */
 .ci-card{background:linear-gradient(135deg,#1a401a,#0d1a0d);border:1px solid rgba(102,187,106,.3);border-radius:11px;padding:16px;text-align:center;margin-bottom:13px;}
 
+/* POMODORO */
+.pom-card{background:linear-gradient(135deg,#1a0d2e,#0d1a2e);border:1px solid rgba(123,94,167,.5);border-radius:12px;padding:16px;margin-bottom:11px;text-align:center;}
+.pom-time{font-size:60px;font-weight:900;letter-spacing:2px;line-height:1;font-variant-numeric:tabular-nums;}
+.pom-time.work{color:var(--blue);}
+.pom-time.brk{color:#66bb6a;}
+.pom-btns{display:flex;gap:8px;justify-content:center;margin-top:13px;}
+.pom-dots{display:flex;gap:6px;justify-content:center;margin-top:10px;}
+.pom-dot{width:10px;height:10px;border-radius:50%;border:2px solid rgba(255,255,255,.2);}
+.pom-dot.done{background:var(--blue);border-color:var(--blue);}
+.pom-dot.active{background:transparent;border-color:var(--blue);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.6}}
+
+/* MOOD */
+.mood-card{background:linear-gradient(135deg,#1a1530,#0d1030);border:1px solid rgba(171,71,188,.4);border-radius:12px;padding:14px;margin-bottom:11px;}
+.mood-btns{display:flex;justify-content:space-around;margin-top:8px;}
+.mood-btn{background:var(--card2);border:2px solid var(--border);border-radius:10px;padding:8px 10px;cursor:pointer;font-size:22px;transition:all .2s;flex:1;margin:0 3px;}
+.mood-btn:hover{border-color:var(--b);transform:scale(1.05);}
+.mood-btn.selected{border-color:var(--b);background:rgba(171,71,188,.2);transform:scale(1.08);}
+.mood-label{font-size:10px;color:var(--muted);text-align:center;margin-top:4px;}
+.mood-msg{font-size:12px;text-align:center;margin-top:10px;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,.04);}
+
+/* REMINDER BAR */
+.reminder-bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:linear-gradient(135deg,#1a1040,#0d1540);border-top:1px solid rgba(74,158,255,.35);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(8px);}
+.reminder-bar.hidden{display:none;}
+.reminder-text{font-size:12px;color:var(--text);}
+.reminder-count{font-size:18px;font-weight:900;color:var(--blue);}
+.reminder-dismiss{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px;}
+
 /* RANK COLORS */
 .rc-e{color:var(--e);border-color:var(--e);}
 .rc-d{color:var(--d);border-color:var(--d);}
@@ -176,6 +204,19 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <div class="toasts" id="toasts"></div>
 
+<!-- REMINDER BAR -->
+<div class="reminder-bar hidden" id="reminderBar">
+  <div>
+    <div class="reminder-count" id="reminderCount">3</div>
+    <div class="reminder-text" id="reminderText">missions à faire aujourd'hui</div>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-size:13px;color:var(--blue);font-weight:700;" id="reminderTime"></div>
+    <div style="font-size:10px;color:var(--muted);">avant le check-in</div>
+  </div>
+  <button class="reminder-dismiss" onclick="document.getElementById('reminderBar').classList.add('hidden')">×</button>
+</div>
+
 <div class="main">
 
 <!-- DASHBOARD -->
@@ -208,6 +249,31 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
     <div class="sum-row"><span>XP gagné</span><span id="dXP" style="color:var(--blue);font-weight:700;">0 XP</span></div>
     <div class="sum-row"><span>Missions complétées</span><span id="dMissions" style="color:#66bb6a;font-weight:700;">0</span></div>
     <div class="sum-row"><span>Check-in soir</span><span id="dCheckin">❌</span></div>
+  </div>
+
+  <!-- HUMEUR DU JOUR -->
+  <div class="mood-card" id="moodCard">
+    <div class="card-t">🌙 Humeur du jour</div>
+    <div class="mood-btns" id="moodBtns">
+      <button class="mood-btn" onclick="setMood(1)"><div>😵</div><div class="mood-label">Vide</div></button>
+      <button class="mood-btn" onclick="setMood(2)"><div>😔</div><div class="mood-label">Bas</div></button>
+      <button class="mood-btn" onclick="setMood(3)"><div>😐</div><div class="mood-label">Normal</div></button>
+      <button class="mood-btn" onclick="setMood(4)"><div>😊</div><div class="mood-label">Bien</div></button>
+      <button class="mood-btn" onclick="setMood(5)"><div>🔥</div><div class="mood-label">En feu</div></button>
+    </div>
+    <div class="mood-msg" id="moodMsg">Quel est ton niveau d'énergie aujourd'hui ?</div>
+  </div>
+
+  <!-- POMODORO -->
+  <div class="pom-card">
+    <div class="card-t">⏱ Timer Pomodoro · +25 XP Mental à la fin</div>
+    <div class="pom-time work" id="pomDisplay">25:00</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:5px;" id="pomLabel">Session de travail</div>
+    <div class="pom-dots" id="pomDots"></div>
+    <div class="pom-btns">
+      <button class="btn btn-primary" id="pomBtn" onclick="togglePomodoro()">▶ Démarrer</button>
+      <button class="btn btn-outline" onclick="resetPomodoro()">↺ Reset</button>
+    </div>
   </div>
 </div>
 
@@ -382,15 +448,23 @@ const STATS=[
   {k:'ressources',l:'Ressources',i:'💰'},
 ];
 const DEFAULT_DAILY=[
-  {id:'d1',text:"Boire 1.5L d'eau aujourd'hui",        xp:10, stat:'force',   tier:'mmv'},
-  {id:'d2',text:'Écrire 3 lignes sur ta journée',      xp:10, stat:'mental',  tier:'mmv'},
-  {id:'d3',text:'Sortir du lit avant 14h',             xp:5,  stat:'mental',  tier:'mmv'},
-  {id:'d4',text:'10 minutes de mouvement (marche...)', xp:15, stat:'force',   tier:'easy'},
-  {id:'d5',text:'Éviter les réseaux sociaux 1h d\'affilée',xp:20,stat:'mental',tier:'easy'},
-  {id:'d6',text:'Lire 15 minutes',                     xp:20, stat:'savoir',  tier:'easy'},
-  {id:'d7',text:'Session focus 25 min sans téléphone', xp:25, stat:'mental',  tier:'normal'},
-  {id:'d8',text:'Avancer sur un projet créatif',       xp:30, stat:'creation',tier:'normal'},
-  {id:'d9',text:'Faire une chose que tu évitais',      xp:35, stat:'mental',  tier:'hard'},
+  {id:'d1', text:"Boire 1.5L d'eau aujourd'hui",              xp:10, stat:'force',    tier:'mmv'},
+  {id:'d2', text:'Écrire 3 lignes sur ta journée',            xp:10, stat:'mental',   tier:'mmv'},
+  {id:'d3', text:'Sortir du lit avant 14h',                   xp:5,  stat:'mental',   tier:'mmv'},
+  {id:'d4', text:'Méditer ou respirer 5 minutes',             xp:10, stat:'mental',   tier:'mmv'},
+  {id:'d5', text:'10 minutes de mouvement (marche...)',       xp:15, stat:'force',    tier:'easy'},
+  {id:'d6', text:"Éviter les réseaux sociaux 1h d'affilée",  xp:20, stat:'mental',   tier:'easy'},
+  {id:'d7', text:'Lire 15 minutes',                           xp:20, stat:'savoir',   tier:'easy'},
+  {id:'d8', text:'Ranger un endroit dans ta chambre',         xp:15, stat:'mental',   tier:'easy'},
+  {id:'d9', text:'Regarder une vidéo éducative (pas YT trash)',xp:20,stat:'savoir',   tier:'easy'},
+  {id:'d10',text:'Ne pas ouvrir les réseaux avant 11h',       xp:25, stat:'mental',   tier:'normal'},
+  {id:'d11',text:'Session focus 25 min sans téléphone',       xp:25, stat:'mental',   tier:'normal'},
+  {id:'d12',text:'Faire 20 pompes ou squats',                 xp:25, stat:'force',    tier:'normal'},
+  {id:'d13',text:'Avancer sur un projet créatif',             xp:30, stat:'creation', tier:'normal'},
+  {id:'d14',text:'Préparer les habits/affaires pour demain',  xp:15, stat:'mental',   tier:'easy'},
+  {id:'d15',text:'Faire une chose que tu évitais',            xp:35, stat:'mental',   tier:'hard'},
+  {id:'d16',text:'Sport 30 min (vrai effort)',                xp:40, stat:'force',    tier:'hard'},
+  {id:'d17',text:'Travailler sur quelque chose d\'important', xp:40, stat:'ressources',tier:'hard'},
 ];
 const DEFAULT_WEEKLY=[
   {id:'w1',text:'Faire du sport au moins 3 fois',       xp:100,stat:'force'},
@@ -702,8 +776,111 @@ function renderSettings(){
   rd.forEach(r=>{const g=document.createElement('div');g.className='fg';g.innerHTML=`<label class="flbl">${r.l}</label><input class="finput" id="rw_${r.k}" value="${D.settings.rewards[r.k]||''}" placeholder="Ta récompense..."/>`;c.appendChild(g);});
 }
 
+// ===== POMODORO =====
+let pomRunning=false, pomInterval=null, pomSeconds=25*60, pomSession=1, pomType='work';
+const POM_WORK=25*60, POM_SHORT=5*60, POM_LONG=15*60;
+
+function togglePomodoro(){
+  if(pomRunning){
+    clearInterval(pomInterval);pomRunning=false;
+    document.getElementById('pomBtn').textContent='▶ Reprendre';
+  } else {
+    pomRunning=true;
+    document.getElementById('pomBtn').textContent='⏸ Pause';
+    pomInterval=setInterval(tickPom,1000);
+  }
+}
+function tickPom(){
+  pomSeconds--;
+  if(pomSeconds<=0){pomComplete();return;}
+  renderPom();
+}
+function pomComplete(){
+  clearInterval(pomInterval);pomRunning=false;
+  if(pomType==='work'){
+    gainXP('mental',25,'Pomodoro terminé 🍅');
+    if(pomSession>=4){
+      pomSession=1;pomType='break';pomSeconds=POM_LONG;
+      toast('🎉 4 Pomodoros! Longue pause 15min. +25 XP','success');
+    } else {
+      pomSession++;pomType='break';pomSeconds=POM_SHORT;
+      toast('✅ Pomodoro fini! Pause 5min. +25 XP 🍅','success');
+    }
+  } else {
+    pomType='work';pomSeconds=POM_WORK;
+    toast('⚡ Pause terminée. Au travail!');
+  }
+  document.getElementById('pomBtn').textContent='▶ Démarrer';
+  renderPom();
+}
+function resetPomodoro(){
+  clearInterval(pomInterval);pomRunning=false;
+  pomSeconds=POM_WORK;pomType='work';
+  document.getElementById('pomBtn').textContent='▶ Démarrer';
+  renderPom();
+}
+function renderPom(){
+  const m=Math.floor(pomSeconds/60).toString().padStart(2,'0');
+  const s=(pomSeconds%60).toString().padStart(2,'0');
+  const disp=document.getElementById('pomDisplay');
+  if(!disp)return;
+  disp.textContent=m+':'+s;
+  disp.className='pom-time '+(pomType==='work'?'work':'brk');
+  document.getElementById('pomLabel').textContent=pomType==='work'?`Session de travail ${pomSession}/4`:`Pause ${pomSession===1&&pomSeconds===POM_LONG?'longue (15min)':'courte (5min)'}`;
+  const dots=document.getElementById('pomDots');dots.innerHTML='';
+  for(let i=1;i<=4;i++){const d=document.createElement('div');d.className='pom-dot'+(i<pomSession?' done':i===pomSession&&pomType==='work'?' active':'');dots.appendChild(d);}
+}
+
+// ===== MOOD =====
+const MOOD_DATA=[
+  {emoji:'😵',msg:'Journée difficile. Fais juste la MMV — c\'est suffisant.',color:'#666'},
+  {emoji:'😔',msg:'Énergie basse. 2-3 petites missions et c\'est une victoire.',color:'#ab47bc'},
+  {emoji:'😐',msg:'Mode normal. Lance-toi sur les missions standard.',color:'#42a5f5'},
+  {emoji:'😊',msg:'Bonne journée. Tu peux viser les missions difficiles!',color:'#66bb6a'},
+  {emoji:'🔥',msg:'TU ES EN FEU. Lance un Boss Raid ou pousse fort aujourd\'hui!',color:'#ffa726'},
+];
+function setMood(n){
+  D.todayMood=n;
+  if(!D.moodHistory)D.moodHistory=[];
+  D.moodHistory.push({date:today(),mood:n});
+  gainXP('mental',5,'Humeur du jour enregistrée');
+  save();renderMood();
+  toast(MOOD_DATA[n-1].emoji+' Humeur enregistrée! +5 XP');
+}
+function renderMood(){
+  const mood=D.todayMood||0;
+  const btns=document.querySelectorAll('.mood-btn');
+  btns.forEach((b,i)=>{b.classList.toggle('selected',i+1===mood);});
+  const msg=document.getElementById('moodMsg');
+  if(!msg)return;
+  if(mood>0){
+    const m=MOOD_DATA[mood-1];
+    msg.textContent=m.emoji+' '+m.msg;
+    msg.style.color=m.color;
+    msg.style.borderLeft='3px solid '+m.color;
+    msg.style.paddingLeft='10px';
+  } else {
+    msg.textContent="Quel est ton niveau d'énergie aujourd'hui ?";
+    msg.style.color='';msg.style.borderLeft='';
+  }
+}
+
+// ===== REMINDER BAR =====
+function updateReminderBar(){
+  const bar=document.getElementById('reminderBar');if(!bar)return;
+  const pending=D.daily.filter(m=>!m.done).length;
+  const h=new Date().getHours();
+  if(pending===0||h<10){bar.classList.add('hidden');return;}
+  bar.classList.remove('hidden');
+  document.getElementById('reminderCount').textContent=pending;
+  document.getElementById('reminderText').textContent=pending===1?'mission à faire aujourd\'hui':'missions à faire aujourd\'hui';
+  const timeLeft=21-h;
+  document.getElementById('reminderTime').textContent=timeLeft>0?timeLeft+'h restantes':'Check-in bientôt!';
+}
+setInterval(updateReminderBar,30000);
+
 // ===== INIT =====
-checkResets();renderAll();
+checkResets();renderAll();renderPom();renderMood();updateReminderBar();
 const nbDl=document.getElementById('nbDeadline');
 if(nbDl){const d=new Date();d.setDate(d.getDate()+14);nbDl.value=d.toISOString().slice(0,10);}
 </script>
