@@ -4,826 +4,960 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Serments du Jour</title>
-<meta name="theme-color" content="#0c0808"/>
+<meta name="theme-color" content="#0c0909"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg:       #0c0808;
-  --surface:  #130d0d;
-  --surface2: #1b1212;
-  --border:   #2d1818;
-  --border2:  #3d2222;
-  --red:      #7a1818;
-  --red2:     #8f1e1e;
-  --gold:     #b8923a;
-  --gold2:    #c9a84c;
-  --gold-bg:  rgba(184,146,58,.08);
-  --text:     #ede8df;
-  --soft:     #a89e94;
-  --muted:    #6a5c55;
-  --green:    #4a8a40;
-  --green-bg: rgba(42,74,37,.25);
-}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Inter',-apple-system,sans-serif;
-  font-size:14px;
-  line-height:1.55;
-  min-height:100vh;
-  padding-bottom:64px;
+:root{
+  --bg:#0c0909;--surf:#150d0d;--surf2:#1e1212;--border:#2a1616;
+  --bx:#8b1a1a;--bx2:#5c1010;--gold:#c49a38;--gold2:#8a6820;
+  --txt:#ede4d5;--txt2:#9a8070;--txt3:#5a4040;
+  --ok:#3d6b3d;--ok2:rgba(61,107,61,.15);
+  --mn:#7a6015;--mn2:rgba(122,96,21,.15);
+  --fail:#8a1a1a;--fail2:rgba(138,26,26,.15);
 }
+body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;font-size:14px;min-height:100vh;}
 
 /* ── HEADER ── */
-.hdr{
-  padding:26px 20px 16px;
-  text-align:center;
-  border-bottom:1px solid var(--border);
-  background:var(--bg);
-  position:sticky;top:0;z-index:100;
-}
-.hdr-title{
-  font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:26px;font-weight:700;
-  letter-spacing:5px;text-transform:uppercase;
-  color:var(--text);margin-bottom:10px;
-}
-.hdr-meta{
-  display:flex;justify-content:center;align-items:center;
-  gap:14px;flex-wrap:wrap;
-}
-.rank-pill{
-  font-size:11px;font-weight:500;letter-spacing:1px;
-  padding:2px 10px;border-radius:20px;
-  border:1px solid var(--gold);color:var(--gold);
-}
-.hdr-xp{ font-size:12px;color:var(--soft); }
-.streak{
-  font-size:12px;color:var(--gold2);
-  display:flex;align-items:center;gap:3px;
-}
-.day-badge{
-  margin-top:10px;font-size:11px;letter-spacing:1.5px;
-  text-transform:uppercase;color:var(--muted);
-  font-family:'Inter',sans-serif;
-}
-.day-badge.complete{color:var(--green);}
-.day-badge.saved{color:var(--gold);}
-.day-badge.failed{color:#7a3030;}
+.hdr{padding:18px 18px 12px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#110808 0%,var(--bg) 100%);}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.hdr-title{font-family:'Playfair Display',Georgia,serif;font-size:24px;font-weight:700;letter-spacing:.5px;line-height:1.1;}
+.hdr-title em{color:var(--bx);font-style:normal;}
+.hdr-date{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:2px;margin-top:3px;}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.rank-badge{font-size:11px;padding:2px 10px;border:1px solid var(--gold2);border-radius:20px;color:var(--gold);font-weight:500;}
+.hdr-stats{display:flex;gap:14px;margin-top:10px;}
+.stat{font-size:12px;color:var(--txt2);}
+.stat b{color:var(--txt);font-weight:600;}
 
-/* ── MAIN ── */
-.main{max-width:500px;margin:0 auto;padding:18px 14px;}
+/* ── DAY STATUS ── */
+.day-banner{padding:8px 18px;font-size:12px;text-align:center;border-bottom:1px solid var(--border);}
+.day-banner.complete{background:var(--ok2);color:#5a9a5a;}
+.day-banner.saved{background:var(--mn2);color:#9a8030;}
+.day-banner.failed{background:var(--fail2);color:#9a3030;}
+.day-banner.pending{color:var(--txt3);}
 
-/* ── DOMAIN CARD ── */
-.card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:18px 18px 16px;
-  margin-bottom:12px;
-  transition:border-color .4s;
-}
-.card.v-reussi{ border-color:rgba(74,138,64,.45); }
-.card.v-minimum{ border-color:rgba(184,146,58,.35); }
-.card.v-rate{ border-color:rgba(122,24,24,.3); opacity:.72; }
+/* ── LAYOUT ── */
+.layout{display:grid;grid-template-columns:1fr;max-width:960px;margin:0 auto;}
+@media(min-width:720px){.layout{grid-template-columns:200px 1fr;align-items:start;}}
 
-.card-top{
-  display:flex;justify-content:space-between;
-  align-items:flex-start;margin-bottom:2px;
-}
-.domain-name{
-  font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:20px;font-weight:600;letter-spacing:.5px;
-}
-.lvl-badge{
-  font-size:10px;font-weight:500;letter-spacing:.5px;
-  padding:2px 8px;border-radius:12px;
-  border:1px solid rgba(184,146,58,.4);color:var(--gold);
-  white-space:nowrap;margin-top:2px;
-}
-.domain-sub{
-  font-size:10px;letter-spacing:1px;
-  text-transform:uppercase;color:var(--muted);
-  margin-bottom:12px;
-}
+/* ── WEEKLY SIDEBAR ── */
+.weekly{padding:18px 14px;border-bottom:1px solid var(--border);}
+@media(min-width:720px){.weekly{border-bottom:none;border-right:1px solid var(--border);position:sticky;top:0;max-height:100vh;overflow-y:auto;}}
+.wk-title{font-family:'Playfair Display',serif;font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;}
 
-/* PROGRESSION DOTS */
-.prog-row{
-  display:flex;align-items:center;gap:8px;
-  margin-bottom:14px;
-}
-.dots{display:flex;gap:5px;}
-.dot{
-  width:9px;height:9px;border-radius:50%;
-  border:1px solid var(--gold);
-  transition:background .3s;
-}
-.dot.on{ background:var(--gold); }
-.prog-txt{font-size:11px;color:var(--muted);}
+/* Desktop: rows */
+.wk-rows{display:none;}
+@media(min-width:720px){.wk-rows{display:block;}}
+.wk-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--border);}
+.wk-row:last-child{border-bottom:none;}
+.wk-row.today .wk-lbl{color:var(--gold);}
+.wk-lbl{font-size:10px;color:var(--txt3);width:26px;flex-shrink:0;text-transform:uppercase;}
+.wk-dots{display:flex;gap:3px;}
+.wk-d{width:9px;height:9px;border-radius:50%;background:var(--surf2);border:1px solid var(--border);}
+.wk-d.ok{background:var(--ok);border-color:var(--ok);}
+.wk-d.mn{background:var(--mn);border-color:var(--mn);}
+.wk-d.fl{background:var(--fail);border-color:var(--fail);}
+.wk-d.now{background:transparent;border:1px solid var(--bx);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 
-/* DIVIDER */
-.sep{height:1px;background:var(--border);margin:12px 0;}
+/* Mobile: columns */
+.wk-cols{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.wk-cols::-webkit-scrollbar{display:none;}
+@media(min-width:720px){.wk-cols{display:none;}}
+.wk-col{flex-shrink:0;text-align:center;width:34px;}
+.wk-col .wk-lbl{display:block;margin-bottom:4px;}
+.wk-col-dots{display:flex;flex-direction:column;gap:3px;align-items:center;}
 
-/* MISSION LINE */
-.mission-line{
-  font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:16px;font-style:italic;
-  color:var(--soft);margin-bottom:12px;
-}
+.wk-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.wk-leg{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--txt3);}
+.wk-leg-dot{width:7px;height:7px;border-radius:50%;}
 
-/* CHECKLIST */
-.checklist{list-style:none;margin-bottom:12px;}
-.cli{
-  display:flex;align-items:center;gap:10px;
-  padding:7px 8px;border-radius:5px;
-  cursor:pointer;transition:background .15s;
-  margin-bottom:2px;
-}
-.cli:hover{background:var(--surface2);}
-.cli.chk{ opacity:.5; }
-.cli.chk .cli-lbl{ text-decoration:line-through; }
-.cli-box{
-  width:17px;height:17px;flex-shrink:0;border-radius:3px;
-  border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;transition:all .15s;
-}
-.cli.chk .cli-box{ background:var(--red);border-color:var(--red);color:var(--text); }
-.cli-lbl{font-size:13px;color:var(--soft);user-select:none;}
+.wk-sum{margin-top:12px;font-size:11px;color:var(--txt2);line-height:1.7;}
+.wk-sum b{color:var(--txt);}
 
-/* ACTION BUTTONS */
-.actions{
-  display:grid;grid-template-columns:1fr 1fr 1fr;
-  gap:7px;margin-top:12px;
-}
-.btn{
-  padding:9px 4px;border-radius:5px;border:none;
-  font-size:12px;font-weight:500;letter-spacing:.3px;
-  cursor:pointer;transition:all .2s;
-  font-family:'Inter',sans-serif;
-}
-.btn:active{transform:scale(.97);}
-.btn-r{ background:var(--red);color:var(--text);border:1px solid var(--red); }
-.btn-r:hover{ background:var(--red2);border-color:var(--red2); }
-.btn-m{ background:transparent;color:var(--gold);border:1px solid rgba(184,146,58,.4); }
-.btn-m:hover{ border-color:var(--gold);background:var(--gold-bg); }
-.btn-x{ background:transparent;color:var(--muted);border:1px solid var(--border2); }
-.btn-x:hover{ border-color:#5a2a2a;color:#8a5050; }
+/* ── DOMAIN CARDS ── */
+.domains{padding:14px;display:flex;flex-direction:column;gap:10px;}
+.dcard{background:var(--surf);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .4s;}
+.dcard.s-ok{border-color:rgba(61,107,61,.45);}
+.dcard.s-mn{border-color:rgba(122,96,21,.45);}
+.dcard.s-fl{border-color:rgba(138,26,26,.45);}
 
-/* VALIDATED */
-.v-box{
-  padding:12px;border-radius:5px;
-  text-align:center;font-size:13px;
-  margin-top:4px;
-}
-.v-box.reussi{ background:var(--green-bg);color:var(--green);border:1px solid rgba(74,138,64,.25); }
-.v-box.minimum{ background:var(--gold-bg);color:var(--gold2);border:1px solid rgba(184,146,58,.2); }
-.v-box.rate{ background:rgba(90,18,18,.2);color:#8a4444;border:1px solid rgba(122,24,24,.2); }
+.dcard-hdr{padding:13px 15px 10px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border);}
+.dcard-left{display:flex;align-items:center;gap:9px;}
+.dcard-icon{font-size:20px;line-height:1;}
+.dcard-nm{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;}
+.dcard-lv{font-size:10px;color:var(--txt2);margin-top:1px;}
+.prog-dots{display:flex;gap:4px;align-items:center;}
+.pdot{width:10px;height:10px;border-radius:50%;border:1px solid var(--bx2);background:transparent;transition:background .3s;}
+.pdot.on{background:var(--bx);border-color:var(--bx);}
+.prog-frac{font-size:9px;color:var(--txt3);margin-left:3px;}
 
-/* INPUTS */
-.fg{ margin-bottom:10px; }
-.flbl{
-  display:block;font-size:10px;letter-spacing:.8px;
-  text-transform:uppercase;color:var(--muted);margin-bottom:4px;
-}
-.finput{
-  width:100%;background:var(--surface2);
-  border:1px solid var(--border2);border-radius:5px;
-  padding:8px 10px;color:var(--text);font-size:13px;
-  font-family:'Inter',sans-serif;transition:border-color .2s;
-}
-.finput:focus{ outline:none;border-color:rgba(184,146,58,.5); }
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.dcard-body{padding:13px 15px;}
+.mission-desc{font-size:12px;color:var(--txt2);font-style:italic;margin-bottom:11px;line-height:1.6;border-left:2px solid var(--bx2);padding-left:9px;}
 
-/* BOOK BAR */
-.bk-bar{height:3px;background:var(--surface2);border-radius:2px;margin-top:6px;overflow:hidden;}
-.bk-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .5s;}
-.bk-txt{font-size:10px;color:var(--muted);margin-top:3px;text-align:right;}
+/* Checklist */
+.cklist{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.ck-item{display:flex;align-items:center;gap:9px;padding:5px 0;cursor:pointer;}
+.ck-box{width:16px;height:16px;border:1px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--ok);background:transparent;transition:all .2s;}
+.ck-item.done .ck-box{background:var(--ok);border-color:var(--ok);}
+.ck-item.done .ck-txt{text-decoration:line-through;color:var(--txt2);}
+.ck-txt{font-size:13px;}
 
-/* SETTINGS */
-.settings-toggle{
-  text-align:center;margin-top:20px;
-}
-.stg-btn{
-  background:none;border:none;color:var(--muted);
-  font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
-  cursor:pointer;padding:8px 16px;transition:color .2s;
-  font-family:'Inter',sans-serif;
-}
-.stg-btn:hover{color:var(--soft);}
-.stg-panel{
-  display:none;background:var(--surface);
-  border:1px solid var(--border);border-radius:8px;
-  padding:18px;margin-top:8px;
-}
-.stg-panel.open{display:block;}
-.stg-title{
-  font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:17px;color:var(--soft);
-  margin-bottom:16px;letter-spacing:1px;
-}
-.stg-sec{margin-bottom:14px;}
-.stg-sec-t{
-  font-size:9px;text-transform:uppercase;letter-spacing:1.5px;
-  color:var(--muted);margin-bottom:9px;
-  padding-bottom:5px;border-bottom:1px solid var(--border);
-}
-.btn-save{
-  background:var(--red);color:var(--text);
-  border:1px solid var(--red);padding:9px 16px;
-  border-radius:5px;font-size:12px;cursor:pointer;
-  font-family:'Inter',sans-serif;transition:background .2s;
-}
-.btn-save:hover{background:var(--red2);}
-.btn-ghost{
-  background:transparent;border:1px solid var(--border2);
-  color:var(--muted);padding:9px 16px;border-radius:5px;
-  font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;
-  margin-left:8px;
-}
+/* Book fields */
+.book-fields{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px;}
+.bf-group{display:flex;align-items:center;gap:5px;}
+.bf-lbl{font-size:10px;color:var(--txt2);}
+.bf-inp{background:var(--surf2);border:1px solid var(--border);border-radius:5px;padding:4px 8px;color:var(--txt);font-size:12px;width:90px;}
+.bf-inp.wide{width:150px;}
+.bf-inp:focus{outline:none;border-color:var(--bx2);}
+.book-bar{height:3px;background:var(--surf2);border-radius:2px;margin-bottom:6px;overflow:hidden;}
+.book-bar-fill{height:100%;background:var(--gold2);border-radius:2px;transition:width .5s;}
+.book-pct{font-size:10px;color:var(--txt3);text-align:right;margin-bottom:10px;}
 
-/* LEVEL UP ANIM */
-@keyframes lvlUp{
-  0%{box-shadow:0 0 0 0 rgba(184,146,58,.4);}
-  40%{box-shadow:0 0 0 8px rgba(184,146,58,.1);}
-  100%{box-shadow:none;}
-}
-.lv-anim{animation:lvlUp 1.4s ease forwards;}
+/* Sport */
+.sport-badge{display:inline-block;padding:2px 9px;background:var(--bx2);border-radius:20px;font-size:10px;margin-bottom:10px;}
+.ex-list{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.ex-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--surf2);border-radius:6px;cursor:pointer;transition:opacity .2s;}
+.ex-item.done{opacity:.4;}
+.ex-item.done .ex-name{text-decoration:line-through;}
+.ex-name{font-size:12px;}
+.ex-sets{font-size:11px;color:var(--bx);font-weight:500;}
+.ex-ck{font-size:12px;color:var(--txt3);}
+.ex-item.done .ex-ck{color:var(--ok);}
 
-/* TOAST */
-.toasts{
-  position:fixed;top:76px;right:12px;
-  z-index:999;display:flex;flex-direction:column;gap:6px;
-}
-.toast{
-  background:var(--surface2);border:1px solid var(--border2);
-  border-radius:6px;padding:9px 13px;font-size:12px;
-  color:var(--soft);max-width:210px;
-  animation:tIn .28s ease, tOut .28s ease 2.8s forwards;
-}
-.toast.gold{border-color:rgba(184,146,58,.5);color:var(--gold2);}
-.toast.ok{border-color:rgba(74,138,64,.4);color:var(--green);}
-@keyframes tIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes tOut{from{opacity:1}to{opacity:0;transform:translateY(-5px)}}
+/* Devoirs */
+.dv-inp{width:100%;background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--txt);font-size:13px;margin-bottom:12px;}
+.dv-inp:focus{outline:none;border-color:var(--bx2);}
+.dv-inp::placeholder{color:var(--txt3);}
+
+/* Action buttons */
+.act-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.act-btn{padding:9px 4px;border-radius:7px;border:1px solid;font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:var(--txt);transition:all .2s;font-family:'Inter',sans-serif;}
+.act-btn:active{transform:scale(.96);}
+.btn-ok{border-color:rgba(61,107,61,.5);color:#5a9a5a;}
+.btn-ok:hover{background:var(--ok2);}
+.btn-mn{border-color:rgba(122,96,21,.5);color:#9a8030;}
+.btn-mn:hover{background:var(--mn2);}
+.btn-fl{border-color:rgba(138,26,26,.5);color:#9a3030;}
+.btn-fl:hover{background:var(--fail2);}
+
+/* Result + edit */
+.result-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:7px;font-size:13px;font-weight:500;}
+.result-row.ok{background:var(--ok2);color:#5a9a5a;border:1px solid rgba(61,107,61,.3);}
+.result-row.mn{background:var(--mn2);color:#9a8030;border:1px solid rgba(122,96,21,.3);}
+.result-row.fl{background:var(--fail2);color:#9a3030;border:1px solid rgba(138,26,26,.3);}
+.edit-btn{background:none;border:none;color:var(--txt2);font-size:11px;cursor:pointer;text-decoration:underline;padding:0;font-family:'Inter',sans-serif;}
+
+/* Footer */
+.footer{padding:16px;text-align:center;border-top:1px solid var(--border);margin-top:4px;}
+.footer-btn{background:none;border:1px solid var(--border);color:var(--txt2);padding:7px 18px;border-radius:20px;font-size:12px;cursor:pointer;}
+.footer-btn:hover{border-color:var(--bx2);color:var(--txt);}
+
+/* Settings modal */
+.sov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:flex-end;justify-content:center;}
+.sov.open{display:flex;}
+.spanel{background:var(--surf);border:1px solid var(--border);border-radius:16px 16px 0 0;padding:22px 18px 32px;width:100%;max-width:600px;max-height:86vh;overflow-y:auto;position:relative;}
+.spanel-title{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:18px;}
+.sclose{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--txt2);font-size:24px;cursor:pointer;}
+.ssec{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.ssec:last-child{border-bottom:none;margin-bottom:0;}
+.ssec-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--txt2);margin-bottom:10px;}
+.srow{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.srow label{font-size:12px;color:var(--txt2);flex:1;}
+.sinp{background:var(--surf2);border:1px solid var(--border);border-radius:5px;padding:6px 9px;color:var(--txt);font-size:13px;}
+.sinp:focus{outline:none;border-color:var(--bx2);}
+.sinp.w-full{width:100%;margin-bottom:6px;}
+.sbtn{background:var(--bx2);border:none;color:var(--txt);padding:9px 16px;border-radius:7px;font-size:13px;cursor:pointer;margin-top:4px;}
+.sbtn:hover{background:var(--bx);}
+.sbtn-outline{background:transparent;border:1px solid var(--border);color:var(--txt2);padding:8px 14px;border-radius:7px;font-size:12px;cursor:pointer;margin-top:4px;}
+.sync-status{font-size:11px;color:var(--txt2);margin-top:6px;}
+.sync-status.ok{color:#5a9a5a;}
+.sync-status.err{color:#9a3030;}
+
+/* Toasts */
+.toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;}
+.toast{background:var(--surf);border:1px solid var(--gold2);color:var(--gold);padding:9px 20px;border-radius:20px;font-size:13px;font-family:'Playfair Display',serif;white-space:nowrap;animation:tIn .3s ease,tOut .3s ease 2.7s forwards;}
+.toast.red{border-color:rgba(138,26,26,.5);color:#9a3030;}
+.toast.green{border-color:rgba(61,107,61,.5);color:#5a9a5a;}
+@keyframes tIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tOut{from{opacity:1}to{opacity:0}}
 </style>
 </head>
 <body>
 
-<div class="toasts" id="toasts"></div>
-
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-title">Serments du Jour</div>
-  <div class="hdr-meta">
-    <div class="rank-pill" id="hRank">E-Rank</div>
-    <div class="hdr-xp" id="hXP">0 XP</div>
-    <div class="streak">🔥 <span id="hStreak">0</span></div>
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-title">Serments <em>du Jour</em></div>
+      <div class="hdr-date" id="hdrDate"></div>
+    </div>
+    <div class="hdr-right">
+      <div class="rank-badge" id="hdrRank">E-Rang</div>
+    </div>
   </div>
-  <div class="day-badge" id="hDay">En cours</div>
+  <div class="hdr-stats">
+    <div class="stat">🔥 Streak <b id="hdrStreak">0</b></div>
+    <div class="stat">⭐ <b id="hdrXP">0</b> XP</div>
+    <div class="stat" id="hdrSync" style="margin-left:auto;font-size:10px;color:var(--txt3);"></div>
+  </div>
 </div>
 
-<div class="main">
+<!-- DAY STATUS -->
+<div class="day-banner pending" id="dayBanner">Accomplis tes serments.</div>
 
-  <!-- NUTRITION -->
-  <div class="card" id="card-nutrition">
-    <div class="card-top">
-      <div class="domain-name">Nutrition</div>
-      <div class="lvl-badge" id="lv-nutrition">Niveau 1</div>
+<div class="layout">
+
+  <!-- WEEKLY SIDEBAR -->
+  <div class="weekly">
+    <div class="wk-title">Semaine</div>
+
+    <!-- Desktop rows -->
+    <div class="wk-rows" id="wkRows"></div>
+
+    <!-- Mobile columns -->
+    <div class="wk-cols" id="wkCols"></div>
+
+    <div class="wk-legend">
+      <div class="wk-leg"><div class="wk-leg-dot" style="background:var(--ok)"></div>Réussi</div>
+      <div class="wk-leg"><div class="wk-leg-dot" style="background:var(--mn)"></div>Minimum</div>
+      <div class="wk-leg"><div class="wk-leg-dot" style="background:var(--fail)"></div>Raté</div>
     </div>
-    <div class="domain-sub" id="sb-nutrition">Structure</div>
-    <div class="prog-row">
-      <div class="dots" id="dots-nutrition"></div>
-      <div class="prog-txt" id="pt-nutrition">0 / 3</div>
-    </div>
-    <div id="bd-nutrition"></div>
+    <div class="wk-sum" id="wkSummary"></div>
   </div>
 
-  <!-- LECTURE -->
-  <div class="card" id="card-lecture">
-    <div class="card-top">
-      <div class="domain-name">Lecture</div>
-      <div class="lvl-badge" id="lv-lecture">Niveau 1</div>
-    </div>
-    <div class="domain-sub" id="sb-lecture">Contact quotidien</div>
-    <div class="prog-row">
-      <div class="dots" id="dots-lecture"></div>
-      <div class="prog-txt" id="pt-lecture">0 / 3</div>
-    </div>
-    <div id="bd-lecture"></div>
+  <!-- DOMAIN CARDS -->
+  <div class="domains">
+    <div class="dcard" id="card-nutrition"></div>
+    <div class="dcard" id="card-lecture"></div>
+    <div class="dcard" id="card-sport"></div>
+    <div class="dcard" id="card-devoirs"></div>
   </div>
-
-  <!-- SPORT -->
-  <div class="card" id="card-sport">
-    <div class="card-top">
-      <div class="domain-name">Sport</div>
-      <div class="lvl-badge" id="lv-sport">Niveau 1</div>
-    </div>
-    <div class="domain-sub" id="sb-sport">Routine fixe</div>
-    <div class="prog-row">
-      <div class="dots" id="dots-sport"></div>
-      <div class="prog-txt" id="pt-sport">0 / 3</div>
-    </div>
-    <div id="bd-sport"></div>
-  </div>
-
-  <!-- DEVOIRS -->
-  <div class="card" id="card-devoirs">
-    <div class="card-top">
-      <div class="domain-name">Devoirs</div>
-      <div class="lvl-badge" id="lv-devoirs">Niveau 1</div>
-    </div>
-    <div class="domain-sub" id="sb-devoirs">Exécution</div>
-    <div class="prog-row">
-      <div class="dots" id="dots-devoirs"></div>
-      <div class="prog-txt" id="pt-devoirs">0 / 3</div>
-    </div>
-    <div id="bd-devoirs"></div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div class="settings-toggle">
-    <button class="stg-btn" onclick="toggleStg()">⚙ Paramètres</button>
-  </div>
-  <div class="stg-panel" id="stgPanel">
-    <div class="stg-title">Paramètres</div>
-
-    <div class="stg-sec">
-      <div class="stg-sec-t">Lecture</div>
-      <div class="fg">
-        <label class="flbl">Nom du livre</label>
-        <input class="finput" id="s-book" placeholder="Titre du livre actuel"/>
-      </div>
-      <div class="frow">
-        <div class="fg">
-          <label class="flbl">Page actuelle</label>
-          <input class="finput" id="s-page" type="number" min="0" placeholder="0"/>
-        </div>
-        <div class="fg">
-          <label class="flbl">Total pages</label>
-          <input class="finput" id="s-total" type="number" min="1" placeholder="..."/>
-        </div>
-      </div>
-    </div>
-
-    <div class="stg-sec">
-      <div class="stg-sec-t">Nutrition — horaires</div>
-      <div class="frow">
-        <div class="fg">
-          <label class="flbl">Heure snack</label>
-          <input class="finput" id="s-snack" type="time" value="09:00"/>
-        </div>
-        <div class="fg">
-          <label class="flbl">Repas du soir</label>
-          <input class="finput" id="s-dinner" type="time" value="18:45"/>
-        </div>
-      </div>
-    </div>
-
-    <div class="stg-sec">
-      <div class="stg-sec-t">Devoirs</div>
-      <div class="fg">
-        <label class="flbl">Devoir du jour</label>
-        <input class="finput" id="s-devoir" placeholder="Nom du devoir"/>
-      </div>
-    </div>
-
-    <button class="btn-save" onclick="saveStg()">Enregistrer</button>
-
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-      <div class="stg-sec-t" style="margin-bottom:8px;">Données</div>
-      <button class="btn-save" onclick="exportData()">Exporter</button>
-      <button class="btn-ghost" onclick="document.getElementById('impFile').click()">Importer</button>
-      <input type="file" id="impFile" accept=".json" style="display:none;" onchange="handleImport(event)"/>
-    </div>
-  </div>
-
 </div>
+
+<div class="footer">
+  <button class="footer-btn" onclick="openSettings()">⚙ Paramètres &amp; Sync</button>
+</div>
+
+<!-- SETTINGS -->
+<div class="sov" id="sov">
+  <div class="spanel">
+    <div class="spanel-title">Paramètres</div>
+    <button class="sclose" onclick="closeSettings()">×</button>
+
+    <div class="ssec">
+      <div class="ssec-lbl">📖 Livre</div>
+      <div class="srow"><label>Nom du livre</label></div>
+      <input class="sinp w-full" id="sBookName" placeholder="Titre du livre actuel"/>
+      <div class="srow" style="margin-top:7px;">
+        <label>Page actuelle</label>
+        <input class="sinp" id="sBookCurrent" type="number" min="0" style="width:80px;"/>
+        <label>Total pages</label>
+        <input class="sinp" id="sBookTotal" type="number" min="1" style="width:80px;"/>
+      </div>
+    </div>
+
+    <div class="ssec">
+      <div class="ssec-lbl">🍽 Nutrition — Horaires</div>
+      <div class="srow"><label>Snack matin</label><input class="sinp" id="sSnack" type="time" value="09:00" style="width:100px;"/></div>
+      <div class="srow"><label>Repas du soir</label><input class="sinp" id="sDinner" type="time" value="18:45" style="width:100px;"/></div>
+    </div>
+
+    <div class="ssec">
+      <div class="ssec-lbl">🔄 Synchronisation entre appareils</div>
+      <div style="font-size:12px;color:var(--txt2);margin-bottom:10px;line-height:1.6;">Entre ton token GitHub (scope <b>repo</b>) pour synchroniser ta progression automatiquement entre ton téléphone et ton PC.</div>
+      <input class="sinp w-full" id="sToken" type="password" placeholder="ghp_...  (stocké uniquement sur cet appareil)"/>
+      <div class="sync-status" id="syncStatusMsg"></div>
+    </div>
+
+    <div class="ssec">
+      <div class="ssec-lbl">⚠ Reset</div>
+      <button class="sbtn-outline" onclick="resetDomain()" style="color:#9a3030;border-color:rgba(138,26,26,.4);">Réinitialiser un domaine...</button>
+    </div>
+
+    <button class="sbtn" onclick="saveSettings()" style="width:100%;margin-top:4px;">Enregistrer</button>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
 
 <script>
-// ════════════════════════════════
-//  DONNÉES DE RÉFÉRENCE
-// ════════════════════════════════
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+const REPO = 'leandromazurpro-arch/ascension-protocol';
+const DATA_FILE = 'progression.json';
 
-const RANKS=[
-  {n:'E-Rank',min:0},   {n:'D-Rank',min:200},
-  {n:'C-Rank',min:500}, {n:'B-Rank',min:1000},
-  {n:'A-Rank',min:2000},{n:'S-Rank',min:4000},
+const RANKS = [
+  {n:'E-Rang',min:0},{n:'D-Rang',min:200},{n:'C-Rang',min:500},
+  {n:'B-Rang',min:1000},{n:'A-Rang',min:1800},{n:'S-Rang',min:3000},
 ];
 
-const NUT_LVL=[null,
-  {n:'Structure',    d:'Respecter les 4 moments de nourriture.'},
-  {n:'Protéines',    d:'Ajouter une source de protéine à 2 repas.'},
-  {n:'Protéines +',  d:'Ajouter une source de protéine à 3 repas.'},
-  {n:'Snack évolué', d:'Améliorer la qualité du snack du matin.'},
-  {n:'Anticipation', d:'Préparer au moins 1 repas à l\'avance.'},
+const NUTRITION_LEVELS = [
+  {n:'Structure',desc:'Respecter tes 4 moments de nourriture aujourd\'hui.'},
+  {n:'Protéines',desc:'4 repas + 1 source de protéine à 2 repas.'},
+  {n:'Protéines+',desc:'4 repas + 1 source de protéine à 3 repas.'},
+  {n:'Snack sain',desc:'4 repas + snack sain + protéines à 2 repas.'},
+  {n:'Préparation',desc:'4 repas + préparer 1 repas à l\'avance.'},
 ];
 
-const LEC_LVL=[null,
-  {n:'Contact quotidien',p:5, note:false,sum:false},
-  {n:'Régularité',       p:7, note:false,sum:false},
-  {n:'Profondeur',       p:10,note:false,sum:false},
-  {n:'Cadence',          p:12,note:false,sum:false},
-  {n:'Immersion',        p:15,note:false,sum:false},
-  {n:'Concentration',    p:20,note:false,sum:false},
-  {n:'Analyse I',        p:20,note:true, sum:false},
-  {n:'Analyse II',       p:25,note:true, sum:false},
-  {n:'Maîtrise',         p:30,note:false,sum:false},
-  {n:'Éloquence',        p:30,note:false,sum:true},
+const LECTURE_PAGES = [5,7,10,12,15,20,20,25,25,30];
+const LECTURE_NOTES = [null,null,null,null,null,null,'+ noter 1 idée','+ noter 1 idée','+ noter 1 idée','+ résumé 3 lignes'];
+
+const SPORT_A = [ // Haut du corps
+  {name:'Pompes',note:''},
+  {name:'Rowing haltère',note:'par bras'},
+  {name:'Développé épaules',note:''},
+  {name:'Curl biceps',note:''},
+  {name:'Extension triceps',note:''},
+  {name:'Gainage',note:'',isSpecial:true,specialKey:'gainage'},
+];
+const SPORT_B = [ // Bas du corps + abdos
+  {name:'Squat haltères',note:''},
+  {name:'Fentes',note:'par jambe'},
+  {name:'Soulevé de terre',note:''},
+  {name:'Mollets debout',note:'',isSpecial:true,specialKey:'mollets'},
+  {name:'Crunch',note:'',isSpecial:true,specialKey:'crunch'},
+  {name:'Relevés de jambes',note:''},
 ];
 
-const DEV_LVL=[null,
-  {n:'Exécution',  d:'Terminer 1 devoir aujourd\'hui.'},
-  {n:'Rigueur',    d:'Terminer 1 devoir et le relire.'},
-  {n:'Discipline', d:'Terminer 1 devoir avant une heure fixe.'},
-  {n:'Efficacité', d:'Terminer 2 devoirs.'},
-  {n:'Excellence', d:'Terminer 2 devoirs et les relire.'},
-  {n:'Maîtrise',   d:'Terminer 2 devoirs avant une heure fixe.'},
-  {n:'Perfection', d:'Terminer tous les devoirs du jour.'},
-  {n:'Anticipation',d:'Tous les devoirs + préparer ceux de demain.'},
-];
-
-// Sport config par niveau
-function sportCfg(lv){
-  const L=Math.min(lv,8);
-  return [null,
-    {fs:2,os:2,rp:10,g:{s:2,t:30},mol:{s:2,r:20},cr:{s:2,r:20}},
-    {fs:3,os:2,rp:10,g:{s:2,t:40},mol:{s:3,r:20},cr:{s:3,r:20}},
-    {fs:3,os:3,rp:10,g:{s:3,t:30},mol:{s:3,r:25},cr:{s:3,r:25}},
-    {fs:3,os:3,rp:12,g:{s:3,t:40},mol:{s:4,r:20},cr:{s:4,r:20}},
-    {fs:4,os:3,rp:10,g:{s:3,t:50},mol:{s:4,r:20},cr:{s:4,r:20}},
-    {fs:4,os:4,rp:10,g:{s:3,t:60},mol:{s:4,r:20},cr:{s:4,r:20}},
-    {fs:4,os:4,rp:10,g:{s:3,t:60},mol:{s:4,r:20},cr:{s:4,r:20},wn:true},
-    {fs:4,os:4,rp:12,g:{s:3,t:60},mol:{s:4,r:25},cr:{s:4,r:25}},
-  ][L];
-}
-const SPORT_NAMES=['',...['Routine fixe','Consolidation','Endurance I','Endurance II','Intensité I','Intensité II','Progression charge','Force maximale']];
-
-function sportExos(lv,day){
-  const c=sportCfg(lv);
-  if(day==='A') return [
-    `Pompes — ${c.fs} × ${c.rp} reps`,
-    `Rowing haltère — ${c.fs} × ${c.rp} par bras`,
-    `Développé épaules — ${c.fs} × ${c.rp} reps`,
-    `Curl biceps — ${c.os} × ${c.rp} reps`,
-    `Extension triceps — ${c.os} × ${c.rp} reps`,
-    `Gainage — ${c.g.s} × ${c.g.t} secondes`,
-  ];
-  return [
-    `Squat haltères — ${c.fs} × ${c.rp} reps`,
-    `Fentes — ${c.fs} × ${c.rp} par jambe`,
-    `Soulevé de terre — ${c.fs} × ${c.rp} reps`,
-    `Mollets debout — ${c.mol.s} × ${c.mol.r} reps`,
-    `Crunch — ${c.cr.s} × ${c.cr.r} reps`,
-    `Relevés de jambes — ${c.os} × ${c.rp} reps`,
-  ];
-}
-
-// ════════════════════════════════
-//  ÉTAT & SAUVEGARDE
-// ════════════════════════════════
-
-function defaultState(){
+// Sets/reps par niveau (index 0 = niveau 1)
+function getSportConfig(lv) {
+  const l = Math.min(lv-1, 7);
+  const sets  = [2,3,3,3,4,4,4,4][l];
+  const reps  = [10,10,10,12,10,10,10,12][l];
   return {
-    xp:0, streak:0, lastDate:null,
-    n:{ lv:1, pts:0, status:null, chk:[false,false,false,false] },
-    l:{ lv:1, pts:0, status:null, book:'', page:0, total:0, startPage:0 },
-    s:{ lv:1, pts:0, status:null, day:'A', chk:[false,false,false,false,false,false] },
-    d:{ lv:1, pts:0, status:null, name:'', chk:[false] },
-    cfg:{ snack:'09:00', dinner:'18:45' },
+    sets, reps,
+    gainage:  ['30sec','40sec','30sec','40sec','50sec','60sec','60sec','60sec'][l],
+    gSets:    [2,2,3,3,3,3,3,3][l],
+    mollets:  [20,20,20,25,20,20,25,25][l],
+    mSets:    [2,3,3,3,4,4,4,4][l],
+    crunch:   [20,20,20,25,20,20,25,25][l],
+    cSets:    [2,3,3,3,4,4,4,4][l],
   };
 }
 
-let D=(()=>{try{const s=localStorage.getItem('serments_v2');return s?JSON.parse(s):defaultState();}catch{return defaultState();}})();
-function save(){localStorage.setItem('serments_v2',JSON.stringify(D));}
+const DEVOIRS_LEVELS = [
+  'Terminer 1 devoir aujourd\'hui.',
+  'Terminer 1 devoir + le relire avant de rendre.',
+  'Terminer 1 devoir avant 18h.',
+  'Terminer 2 devoirs aujourd\'hui.',
+  'Terminer 2 devoirs + les relire.',
+  'Terminer 2 devoirs avant 18h.',
+  'Terminer tous les devoirs du jour.',
+  'Terminer tous les devoirs + préparer ceux de demain.',
+];
 
-// ════════════════════════════════
-//  RESET QUOTIDIEN
-// ════════════════════════════════
+function defaultData() {
+  return {
+    xp: 0,
+    streak: { cur: 0, best: 0, lastDate: null },
+    domains: {
+      nutrition: { level: 1, progress: 0, todayStatus: null },
+      lecture:   { level: 1, progress: 0, todayStatus: null },
+      sport:     { level: 1, progress: 0, todayStatus: null, dayAB: 'A' },
+      devoirs:   { level: 1, progress: 0, todayStatus: null },
+    },
+    nutrition: {
+      checks: { petit: false, snack: false, midi: false, soir: false },
+      snackTime: '09:00', dinnerTime: '18:45',
+    },
+    lecture: { bookName: '', currentPage: 0, totalPages: 0, checks: {} },
+    sport:   { checks: {} },
+    devoirs: { taskName: '', checks: {} },
+    history: [], // [{date, nutrition, lecture, sport, devoirs, xpGained}]
+    lastDate: null,
+  };
+}
 
-function todayStr(){return new Date().toISOString().slice(0,10);}
+let D = load();
 
-function dailyReset(){
-  const td=todayStr();
-  if(D.lastDate===td) return;
+function load() {
+  try { const s = localStorage.getItem('serments_v1'); if (s) return JSON.parse(s); } catch(e){}
+  return defaultData();
+}
+function save() {
+  localStorage.setItem('serments_v1', JSON.stringify(D));
+  syncToGitHub();
+}
 
-  if(D.lastDate){
-    // Calcul streak de la veille
-    const all=[D.n,D.l,D.s,D.d];
-    const allOk=all.every(x=>x.status==='reussi'||x.status==='minimum');
-    const allDone=all.every(x=>x.status!==null);
-    D.streak=(allOk&&allDone)?D.streak+1:0;
+// ═══════════════════════════════════════════════
+//  GITHUB SYNC
+// ═══════════════════════════════════════════════
+let _syncTimer = null;
+let _syncSha   = null;
 
-    // Alternance Jour A/B sport
-    if(D.s.status==='reussi'||D.s.status==='minimum')
-      D.s.day=D.s.day==='A'?'B':'A';
+function getToken() { return localStorage.getItem('gh_token') || ''; }
+
+async function syncFromGitHub() {
+  const token = getToken();
+  try {
+    const url = `https://raw.githubusercontent.com/${REPO}/main/${DATA_FILE}?t=${Date.now()}`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const remote = await res.json();
+    // Merge: take whichever is more recent (compare XP as tiebreaker)
+    if (remote && typeof remote.xp === 'number') {
+      const localXP = D.xp || 0;
+      const remoteXP = remote.xp || 0;
+      // Use remote if it has more XP OR same XP but different last date
+      if (remoteXP > localXP || (remoteXP === localXP && remote.lastDate !== D.lastDate)) {
+        D = remote;
+        localStorage.setItem('serments_v1', JSON.stringify(D));
+        renderAll();
+        setSync('Synchronisé ✓', true);
+        return;
+      }
+    }
+    setSync('Synchronisé ✓', true);
+  } catch(e) {}
+}
+
+function syncToGitHub() {
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(async () => {
+    const token = getToken();
+    if (!token) return;
+    setSync('Sync en cours…', false);
+    try {
+      // Get current SHA
+      const info = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_FILE}`, {
+        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+      });
+      let sha = null;
+      if (info.ok) { const j = await info.json(); sha = j.sha; }
+
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(D, null, 2))));
+      const body = { message: 'sync: progression', content };
+      if (sha) body.sha = sha;
+
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_FILE}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type':  'application/json',
+          'Accept':        'application/vnd.github.v3+json',
+        },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) setSync('Synchronisé ✓', true);
+      else setSync('Erreur sync', false, true);
+    } catch(e) { setSync('Hors ligne', false, true); }
+  }, 2000);
+}
+
+function setSync(msg, ok, err) {
+  const el = document.getElementById('hdrSync');
+  const sEl = document.getElementById('syncStatusMsg');
+  if (el) el.textContent = msg;
+  if (sEl) { sEl.textContent = msg; sEl.className = 'sync-status' + (ok?' ok':err?' err':''); }
+}
+
+// ═══════════════════════════════════════════════
+//  DAILY RESET
+// ═══════════════════════════════════════════════
+function todayStr() {
+  return new Date().toLocaleDateString('fr-CA'); // YYYY-MM-DD
+}
+
+function checkDailyReset() {
+  const td = todayStr();
+  if (D.lastDate === td) return;
+
+  // Save yesterday to history
+  if (D.lastDate) {
+    const entry = {
+      date: D.lastDate,
+      nutrition: D.domains.nutrition.todayStatus,
+      lecture:   D.domains.lecture.todayStatus,
+      sport:     D.domains.sport.todayStatus,
+      devoirs:   D.domains.devoirs.todayStatus,
+    };
+    D.history.unshift(entry);
+    if (D.history.length > 60) D.history.pop();
+
+    // Streak
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    const yStr = yesterday.toLocaleDateString('fr-CA');
+    if (D.lastDate === yStr) {
+      const allSaved = ['nutrition','lecture','sport','devoirs'].every(k => D.domains[k].todayStatus !== null && D.domains[k].todayStatus !== 'rate');
+      if (allSaved) { D.streak.cur++; if (D.streak.cur > D.streak.best) D.streak.best = D.streak.cur; }
+      else D.streak.cur = 0;
+    } else {
+      D.streak.cur = 0;
+    }
+    D.streak.lastDate = yStr;
   }
 
-  // Reset états journaliers
-  D.n.status=null; D.n.chk=[false,false,false,false];
-  D.l.status=null; D.l.startPage=D.l.page;
-  D.s.status=null; D.s.chk=[false,false,false,false,false,false];
-  D.d.status=null; D.d.chk=[false];
-  D.lastDate=td;
+  // Reset today
+  ['nutrition','lecture','sport','devoirs'].forEach(k => { D.domains[k].todayStatus = null; });
+  D.nutrition.checks = { petit: false, snack: false, midi: false, soir: false };
+  D.lecture.checks   = {};
+  D.sport.checks     = {};
+  D.devoirs.checks   = {};
+  D.devoirs.taskName = '';
+  D.lastDate = td;
   save();
 }
 
-// ════════════════════════════════
-//  LOGIQUE DE JEU
-// ════════════════════════════════
+// ═══════════════════════════════════════════════
+//  XP & RANK
+// ═══════════════════════════════════════════════
+const XP_MAP = { reussi: 20, minimum: 5, rate: 0 };
+const XP_BONUS_ALL = 50;
 
-function getRank(xp){
-  for(let i=RANKS.length-1;i>=0;i--)if(xp>=RANKS[i].min)return RANKS[i];
-  return RANKS[0];
+function addXP(n) { D.xp += n; }
+function removeXP(n) { D.xp = Math.max(0, D.xp - n); }
+function getRank() {
+  let r = RANKS[0];
+  for (const rk of RANKS) { if (D.xp >= rk.min) r = rk; }
+  return r.n;
 }
 
-function validate(dom,status){
-  const x=getDom(dom);
-  if(x.status!==null)return;
-  x.status=status;
+// ═══════════════════════════════════════════════
+//  RESULT LOGIC
+// ═══════════════════════════════════════════════
+function setResult(domain, result) {
+  const dm = D.domains[domain];
+  if (dm.todayStatus) return; // already set, use edit btn
 
-  let xpGain=0;
-  if(status==='reussi'){ xpGain=20; x.pts=Math.min(x.pts+1,3); }
-  else if(status==='minimum'){ xpGain=5; }
-  else{ xpGain=0; x.pts=Math.max(0,x.pts-1); }
+  dm.todayStatus = result;
 
-  D.xp+=xpGain;
-  if(xpGain>0) toast(`+${xpGain} XP`,'gold');
+  // XP
+  addXP(XP_MAP[result]);
 
-  // Level up ?
-  if(x.pts>=3){
-    x.lv++; x.pts=0;
-    const name={n:'Nutrition',l:'Lecture',s:'Sport',d:'Devoirs'}[dom];
-    setTimeout(()=>toast(`✦ ${name} — Niveau ${x.lv}`,'ok'),400);
-    const card=document.getElementById('card-'+domKey(dom));
-    card.classList.add('lv-anim');
-    setTimeout(()=>card.classList.remove('lv-anim'),1500);
+  // Progress
+  if (result === 'reussi') {
+    dm.progress++;
+    if (dm.progress >= 3) {
+      dm.level++;
+      dm.progress = 0;
+      toast(`✦ ${domainLabel(domain)} — Niveau ${dm.level} atteint`, 'gold');
+      // Alternate sport day
+      if (domain === 'sport') D.domains.sport.dayAB = D.domains.sport.dayAB === 'A' ? 'B' : 'A';
+    }
+  } else if (result === 'rate') {
+    dm.progress = Math.max(0, dm.progress - 1);
+  }
+  // minimum: no change to progress
+
+  // Bonus: all 4 réussi
+  const all4 = ['nutrition','lecture','sport','devoirs'].every(k => D.domains[k].todayStatus === 'reussi');
+  if (all4) { addXP(XP_BONUS_ALL); toast('✦ Journée complète — +50 XP bonus', 'gold'); }
+
+  // Update lecture page
+  if (domain === 'lecture' && result === 'reussi') {
+    const pInput = document.getElementById('lec-page');
+    if (pInput && pInput.value) {
+      D.lecture.currentPage = parseInt(pInput.value) || D.lecture.currentPage;
+    }
   }
 
-  // Bonus si 4/4 réussi
-  const all=[D.n,D.l,D.s,D.d];
-  if(all.every(x=>x.status==='reussi')){
-    D.xp+=50;
-    setTimeout(()=>toast('✦ Journée complète · +50 XP','ok'),700);
+  // Update devoir task
+  if (domain === 'devoirs') {
+    const tInput = document.getElementById('dv-task');
+    if (tInput) D.devoirs.taskName = tInput.value;
   }
 
   save();
   renderAll();
+  updateDayBanner();
 }
 
-function toggleChk(dom,i){
-  const x=getDom(dom);
-  if(x.status!==null)return;
-  x.chk[i]=!x.chk[i];
+function undoResult(domain) {
+  const dm = D.domains[domain];
+  const prev = dm.todayStatus;
+  if (!prev) return;
+
+  // Reverse XP
+  removeXP(XP_MAP[prev]);
+
+  // Reverse progress
+  if (prev === 'reussi') {
+    // If level was gained (progress would have reset), we can't perfectly undo level, but we can reverse progress before reset
+    dm.progress = Math.max(0, dm.progress - 1); // approximate
+  } else if (prev === 'rate') {
+    dm.progress = Math.min(2, dm.progress + 1);
+  }
+
+  // Remove bonus if was all 4
+  const was4 = ['nutrition','lecture','sport','devoirs'].every(k => D.domains[k].todayStatus === 'reussi');
+  if (was4) removeXP(XP_BONUS_ALL);
+
+  dm.todayStatus = null;
   save();
-  renderBody(dom);
+  renderAll();
+  updateDayBanner();
 }
 
-function getDom(d){ return{n:D.n,l:D.l,s:D.s,d:D.d}[d]; }
-function domKey(d){ return{n:'nutrition',l:'lecture',s:'sport',d:'devoirs'}[d]; }
+function domainLabel(k) {
+  return {nutrition:'Nutrition',lecture:'Lecture',sport:'Sport',devoirs:'Devoirs'}[k];
+}
 
-// ════════════════════════════════
+// ═══════════════════════════════════════════════
 //  RENDER
-// ════════════════════════════════
-
-function renderAll(){
+// ═══════════════════════════════════════════════
+function renderAll() {
   renderHeader();
-  ['n','l','s','d'].forEach(renderBody);
+  renderWeekly();
+  renderNutrition();
+  renderLecture();
+  renderSport();
+  renderDevoirs();
+  updateDayBanner();
 }
 
-function renderHeader(){
-  const r=getRank(D.xp);
-  document.getElementById('hRank').textContent=r.n;
-  document.getElementById('hXP').textContent=D.xp+' XP';
-  document.getElementById('hStreak').textContent=D.streak;
-
-  const all=[D.n,D.l,D.s,D.d];
-  const done=all.every(x=>x.status!==null);
-  const allR=all.every(x=>x.status==='reussi');
-  const allM=all.every(x=>x.status==='reussi'||x.status==='minimum');
-  const anyX=all.some(x=>x.status==='rate');
-  const el=document.getElementById('hDay');
-  if(!done){el.textContent='En cours';el.className='day-badge';}
-  else if(allR){el.textContent='✦ Journée complète';el.className='day-badge complete';}
-  else if(allM&&!anyX){el.textContent='○ Journée sauvée';el.className='day-badge saved';}
-  else{el.textContent='✕ Journée incomplète';el.className='day-badge failed';}
+function renderHeader() {
+  const d = new Date();
+  const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  document.getElementById('hdrDate').textContent = `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('hdrRank').textContent  = getRank();
+  document.getElementById('hdrStreak').textContent = D.streak.cur;
+  document.getElementById('hdrXP').textContent    = D.xp;
 }
 
-function renderMeta(dom){
-  const map={
-    n:{lvls:NUT_LVL,maxLv:5},
-    l:{lvls:LEC_LVL,maxLv:10},
-    s:{lvls:null,maxLv:8},
-    d:{lvls:DEV_LVL,maxLv:8},
-  };
-  const x=getDom(dom);
-  const key=domKey(dom);
+function updateDayBanner() {
+  const el = document.getElementById('dayBanner');
+  const statuses = ['nutrition','lecture','sport','devoirs'].map(k => D.domains[k].todayStatus);
+  const done  = statuses.filter(s => s !== null).length;
+  const allOk = statuses.every(s => s === 'reussi');
+  const hasFail = statuses.includes('rate');
+  const allDone = statuses.every(s => s !== null);
 
-  // Level badge
-  document.getElementById('lv-'+key).textContent='Niveau '+x.lv;
-
-  // Subtitle
-  const sbEl=document.getElementById('sb-'+key);
-  if(dom==='n'){ const lv=NUT_LVL[Math.min(x.lv,NUT_LVL.length-1)];sbEl.textContent=lv?lv.n:'Avancé'; }
-  else if(dom==='l'){ const lv=LEC_LVL[Math.min(x.lv,LEC_LVL.length-1)];sbEl.textContent=lv?lv.n:'Maîtrise'; }
-  else if(dom==='s'){ sbEl.textContent=SPORT_NAMES[Math.min(x.lv,8)]||'Maîtrise'; }
-  else if(dom==='d'){ const lv=DEV_LVL[Math.min(x.lv,DEV_LVL.length-1)];sbEl.textContent=lv?lv.n:'Avancé'; }
-
-  // Dots
-  const dotsEl=document.getElementById('dots-'+key);
-  dotsEl.innerHTML='';
-  for(let i=0;i<3;i++){const d=document.createElement('div');d.className='dot'+(i<x.pts?' on':'');dotsEl.appendChild(d);}
-  document.getElementById('pt-'+key).textContent=x.pts+' / 3';
-
-  // Card class
-  const card=document.getElementById('card-'+key);
-  card.className='card'+(x.status?' v-'+x.status:'');
+  if (allOk) { el.className='day-banner complete'; el.textContent='✦ Journée complète — Tous les serments honorés.'; }
+  else if (allDone && !hasFail) { el.className='day-banner saved'; el.textContent='◎ Journée sauvée — Aucun serment raté.'; }
+  else if (hasFail) { el.className='day-banner failed'; el.textContent='✗ Journée compromise — Un serment a été raté.'; }
+  else if (done === 0) { el.className='day-banner pending'; el.textContent='Accomplis tes serments.'; }
+  else { el.className='day-banner pending'; el.textContent=`${done}/4 serments complétés.`; }
 }
 
-function renderBody(dom){
-  renderMeta(dom);
-  const x=getDom(dom);
-  const key=domKey(dom);
-  const bd=document.getElementById('bd-'+key);
+// ─── Weekly graph ────────────────────────────────
+function renderWeekly() {
+  const today = todayStr();
+  const d = new Date();
+  const dow = d.getDay(); // 0=sun
+  const mondayOffset = dow === 0 ? -6 : 1 - dow;
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const dd = new Date(d);
+    dd.setDate(d.getDate() + mondayOffset + i);
+    days.push(dd.toLocaleDateString('fr-CA'));
+  }
+  const lbls = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const domains = ['nutrition','lecture','sport','devoirs'];
+  const domIcons = ['🥗','📖','🏋️','📝'];
 
-  if(dom==='n') bd.innerHTML=x.status?vBox(x.status):bodyNutrition();
-  else if(dom==='l') bd.innerHTML=x.status?vBox(x.status,lBookExtra()):bodyLecture();
-  else if(dom==='s') bd.innerHTML=x.status?vBox(x.status,`<div style="font-size:10px;color:var(--muted);margin-top:3px;">Jour ${D.s.day} — ${D.s.day==='A'?'Haut du corps':'Bas du corps + abdos'}</div>`):bodySport();
-  else if(dom==='d') bd.innerHTML=x.status?vBox(x.status,D.d.name?`<div style="font-size:10px;color:var(--muted);margin-top:3px;">${D.d.name}</div>`:''):bodyDevoirs();
+  function getDots(dateStr) {
+    if (dateStr === today) return domains.map(k => D.domains[k].todayStatus || 'now');
+    const entry = D.history.find(h => h.date === dateStr);
+    if (!entry) return [null,null,null,null];
+    return domains.map(k => entry[k] || null);
+  }
+  function dotClass(s) {
+    if (!s) return 'wk-d';
+    if (s === 'now') return 'wk-d now';
+    if (s === 'reussi') return 'wk-d ok';
+    if (s === 'minimum') return 'wk-d mn';
+    if (s === 'rate') return 'wk-d fl';
+    return 'wk-d';
+  }
+
+  // Desktop rows
+  const rowsEl = document.getElementById('wkRows');
+  rowsEl.innerHTML = '';
+  days.forEach((dateStr, i) => {
+    const dots = getDots(dateStr);
+    const row = document.createElement('div');
+    row.className = 'wk-row' + (dateStr === today ? ' today' : '');
+    const lbl = document.createElement('div'); lbl.className='wk-lbl'; lbl.textContent=lbls[i];
+    const dotsEl = document.createElement('div'); dotsEl.className='wk-dots';
+    dots.forEach(s => { const dot=document.createElement('div'); dot.className=dotClass(s); dotsEl.appendChild(dot); });
+    row.appendChild(lbl); row.appendChild(dotsEl);
+    rowsEl.appendChild(row);
+  });
+
+  // Mobile columns
+  const colsEl = document.getElementById('wkCols');
+  colsEl.innerHTML = '';
+  days.forEach((dateStr, i) => {
+    const dots = getDots(dateStr);
+    const col = document.createElement('div');
+    col.className = 'wk-col' + (dateStr === today ? ' today' : '');
+    const lbl = document.createElement('div'); lbl.className='wk-lbl'; lbl.textContent=lbls[i];
+    const dotsDiv = document.createElement('div'); dotsDiv.className='wk-col-dots';
+    dots.forEach(s => { const dot=document.createElement('div'); dot.className=dotClass(s); dotsDiv.appendChild(dot); });
+    col.appendChild(lbl); col.appendChild(dotsDiv);
+    colsEl.appendChild(col);
+  });
+
+  // Summary
+  const weekReussi = D.history
+    .filter(h => days.slice(0,-1).includes(h.date))
+    .reduce((acc,h) => acc + ['nutrition','lecture','sport','devoirs'].filter(k=>h[k]==='reussi').length, 0);
+  const todayReussi = domains.filter(k=>D.domains[k].todayStatus==='reussi').length;
+  document.getElementById('wkSummary').innerHTML = `<b>${weekReussi + todayReussi}</b> serments honorés cette semaine`;
 }
 
-// ────── NUTRITION ──────
-function bodyNutrition(){
-  const c=D.cfg;
-  const tasks=['Petit-déjeuner','Snack — '+c.snack,'Repas du midi','Repas du soir — '+c.dinner];
-  const items=tasks.map((t,i)=>`<li class="cli${D.n.chk[i]?' chk':''}" onclick="toggleChk('n',${i})"><div class="cli-box">${D.n.chk[i]?'✓':''}</div><span class="cli-lbl">${t}</span></li>`).join('');
-  return `<div class="sep"></div><ul class="checklist">${items}</ul>${btnRow('n')}`;
+// ─── Nutrition ───────────────────────────────────
+function renderNutrition() {
+  const dm = D.domains.nutrition;
+  const lv = NUTRITION_LEVELS[Math.min(dm.level-1, NUTRITION_LEVELS.length-1)];
+  const snack = D.nutrition.snackTime || '09:00';
+  const dinner = D.nutrition.dinnerTime || '18:45';
+  const items = [
+    { k:'petit', label:'Petit-déjeuner' },
+    { k:'snack', label:`Snack — ${snack}` },
+    { k:'midi',  label:'Repas de midi' },
+    { k:'soir',  label:`Repas du soir — ${dinner}` },
+  ];
+
+  let html = cardHead('🍽', 'Nutrition', dm, lv.n);
+  html += `<div class="dcard-body">`;
+  html += `<div class="mission-desc">${lv.desc}</div>`;
+
+  if (dm.todayStatus) {
+    html += resultRow(dm.todayStatus, 'nutrition');
+  } else {
+    html += `<div class="cklist">`;
+    items.forEach(it => {
+      const checked = D.nutrition.checks[it.k];
+      html += `<div class="ck-item${checked?' done':''}" onclick="toggleCheck('nutrition','${it.k}')">
+        <div class="ck-box">${checked?'✓':''}</div>
+        <div class="ck-txt">${it.label}</div>
+      </div>`;
+    });
+    html += `</div>`;
+    html += actionBtns('nutrition');
+  }
+  html += `</div>`;
+  document.getElementById('card-nutrition').innerHTML = html;
+  setCardClass('card-nutrition', dm.todayStatus);
 }
 
-// ────── LECTURE ──────
-function bodyLecture(){
-  const l=D.l;
-  const lvl=LEC_LVL[Math.min(l.lv,LEC_LVL.length-1)]||LEC_LVL[LEC_LVL.length-1];
-  const pct=l.total>0?Math.floor((l.page/l.total)*100):0;
-  let mission=`Lire ${lvl.p} pages aujourd'hui`;
-  if(lvl.note) mission+=' — noter 1 idée';
-  if(lvl.sum)  mission+=' — résumé de 3 lignes';
+// ─── Lecture ─────────────────────────────────────
+function renderLecture() {
+  const dm = D.domains.lecture;
+  const lv = dm.level;
+  const pages = LECTURE_PAGES[Math.min(lv-1, LECTURE_PAGES.length-1)];
+  const note  = LECTURE_NOTES[Math.min(lv-1, LECTURE_NOTES.length-1)];
+  const desc  = `Lire ${pages} pages${note?' '+note:''}.`;
+  const pct = D.lecture.totalPages > 0 ? Math.round((D.lecture.currentPage / D.lecture.totalPages)*100) : 0;
 
-  return `<div class="sep"></div>
-  <div class="fg">
-    <label class="flbl">${l.book||'Livre actuel'}</label>
-    <div class="frow">
-      <div>
-        <label class="flbl">Page actuelle</label>
-        <input class="finput" type="number" value="${l.page}" min="0"
-          oninput="D.l.page=parseInt(this.value)||0;save();updateBkBar();" placeholder="0"/>
-      </div>
-      <div>
-        <label class="flbl">Total pages</label>
-        <input class="finput" type="number" value="${l.total||''}" min="1"
-          oninput="D.l.total=parseInt(this.value)||0;save();updateBkBar();" placeholder="..."/>
-      </div>
+  let html = cardHead('📖', 'Lecture', dm, `Niveau ${lv}`);
+  html += `<div class="dcard-body">`;
+  html += `<div class="mission-desc">${desc}</div>`;
+
+  // Book fields
+  html += `<div class="book-fields">
+    <div class="bf-group"><span class="bf-lbl">Livre</span><input class="bf-inp wide" id="lec-book" value="${esc(D.lecture.bookName)}" placeholder="Titre du livre" onchange="updateBook()"/></div>
+  </div>
+  <div class="book-fields">
+    <div class="bf-group"><span class="bf-lbl">Page actuelle</span><input class="bf-inp" id="lec-page" type="number" value="${D.lecture.currentPage}" min="0" onchange="updateBook()"/></div>
+    <div class="bf-group"><span class="bf-lbl">Total</span><input class="bf-inp" id="lec-total" type="number" value="${D.lecture.totalPages}" min="0" onchange="updateBook()"/></div>
+  </div>`;
+  if (D.lecture.totalPages > 0) {
+    html += `<div class="book-bar"><div class="book-bar-fill" style="width:${pct}%"></div></div>
+    <div class="book-pct">${pct}% terminé — page ${D.lecture.currentPage}/${D.lecture.totalPages}</div>`;
+  }
+
+  if (dm.todayStatus) {
+    html += resultRow(dm.todayStatus, 'lecture');
+  } else {
+    html += actionBtns('lecture');
+  }
+  html += `</div>`;
+  document.getElementById('card-lecture').innerHTML = html;
+  setCardClass('card-lecture', dm.todayStatus);
+}
+
+// ─── Sport ───────────────────────────────────────
+function renderSport() {
+  const dm   = D.domains.sport;
+  const lv   = dm.level;
+  const dayAB = dm.dayAB || 'A';
+  const cfg  = getSportConfig(lv);
+  const exs  = dayAB === 'A' ? SPORT_A : SPORT_B;
+  const dayLabel = dayAB === 'A' ? 'Jour A — Haut du corps' : 'Jour B — Bas du corps & Abdos';
+
+  function getSetRep(ex) {
+    if (ex.specialKey === 'gainage')  return `${cfg.gSets} × ${cfg.gainage}`;
+    if (ex.specialKey === 'mollets')  return `${cfg.mSets} × ${cfg.mollets} reps`;
+    if (ex.specialKey === 'crunch')   return `${cfg.cSets} × ${cfg.crunch} reps`;
+    return `${cfg.sets} × ${cfg.reps} reps${ex.note?' '+ex.note:''}`;
+  }
+
+  let html = cardHead('🏋️', 'Sport', dm, `Niveau ${lv}`);
+  html += `<div class="dcard-body">`;
+  html += `<span class="sport-badge">${dayLabel}</span>`;
+
+  if (dm.todayStatus) {
+    html += resultRow(dm.todayStatus, 'sport');
+  } else {
+    html += `<div class="ex-list">`;
+    exs.forEach((ex, i) => {
+      const ck = !!D.sport.checks[`${dayAB}_${i}`];
+      html += `<div class="ex-item${ck?' done':''}" onclick="toggleExercise('${dayAB}',${i})">
+        <span class="ex-name">${ex.name}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="ex-sets">${getSetRep(ex)}</span>
+          <span class="ex-ck">${ck?'✓':'○'}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+    html += actionBtns('sport');
+  }
+  html += `</div>`;
+  document.getElementById('card-sport').innerHTML = html;
+  setCardClass('card-sport', dm.todayStatus);
+}
+
+// ─── Devoirs ─────────────────────────────────────
+function renderDevoirs() {
+  const dm  = D.domains.devoirs;
+  const lv  = dm.level;
+  const desc = DEVOIRS_LEVELS[Math.min(lv-1, DEVOIRS_LEVELS.length-1)];
+
+  let html = cardHead('📝', 'Devoirs', dm, `Niveau ${lv}`);
+  html += `<div class="dcard-body">`;
+  html += `<div class="mission-desc">${desc}</div>`;
+
+  if (dm.todayStatus) {
+    if (D.devoirs.taskName) {
+      html += `<div style="font-size:12px;color:var(--txt2);margin-bottom:10px;">📌 ${esc(D.devoirs.taskName)}</div>`;
+    }
+    html += resultRow(dm.todayStatus, 'devoirs');
+  } else {
+    html += `<input class="dv-inp" id="dv-task" value="${esc(D.devoirs.taskName)}" placeholder="Quel devoir dois-tu terminer aujourd'hui ?" onchange="D.devoirs.taskName=this.value;save()"/>`;
+    html += actionBtns('devoirs');
+  }
+  html += `</div>`;
+  document.getElementById('card-devoirs').innerHTML = html;
+  setCardClass('card-devoirs', dm.todayStatus);
+}
+
+// ─── HTML helpers ────────────────────────────────
+function cardHead(icon, name, dm, subtitle) {
+  const prog = dm.progress; const max = 3;
+  let dots = '';
+  for (let i=0;i<max;i++) dots += `<div class="pdot${i<prog?' on':''}"></div>`;
+  return `<div class="dcard-hdr">
+    <div class="dcard-left">
+      <div class="dcard-icon">${icon}</div>
+      <div><div class="dcard-nm">${name}</div><div class="dcard-lv">${subtitle}</div></div>
     </div>
-    ${l.total>0?`<div class="bk-bar"><div class="bk-fill" id="bkFill" style="width:${pct}%;"></div></div><div class="bk-txt" id="bkTxt">${pct}% du livre · p.${l.page} / ${l.total}</div>`:''}
-  </div>
-  <div class="sep"></div>
-  <div class="mission-line">${mission}</div>
-  ${btnRow('l')}`;
-}
-
-function lBookExtra(){
-  const l=D.l;
-  if(!l.total) return '';
-  const pct=Math.floor((l.page/l.total)*100);
-  return `<div style="font-size:10px;color:var(--muted);margin-top:3px;">${pct}% du livre · p.${l.page}/${l.total}</div>`;
-}
-
-function updateBkBar(){
-  const l=D.l;
-  const pct=l.total>0?Math.floor((l.page/l.total)*100):0;
-  const f=document.getElementById('bkFill');
-  const t=document.getElementById('bkTxt');
-  if(f)f.style.width=pct+'%';
-  if(t)t.textContent=`${pct}% du livre · p.${l.page} / ${l.total}`;
-}
-
-// ────── SPORT ──────
-function bodySport(){
-  const s=D.s;
-  const day=s.day;
-  const exos=sportExos(s.lv,day);
-  const cfg=sportCfg(s.lv);
-  const dayLabel=day==='A'?'Jour A — Haut du corps':'Jour B — Bas du corps + abdos';
-  const nextDay=day==='A'?'B':'A';
-  const items=exos.map((ex,i)=>`<li class="cli${s.chk[i]?' chk':''}" onclick="toggleChk('s',${i})"><div class="cli-box">${s.chk[i]?'✓':''}</div><span class="cli-lbl">${ex}</span></li>`).join('');
-  const wn=cfg&&cfg.wn?`<div style="font-size:11px;color:var(--gold);margin:8px 0 4px;">↑ Ce niveau : augmenter légèrement le poids</div>`:'';
-  return `<div class="sep"></div>
-  <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">${dayLabel} <span style="margin-left:8px;opacity:.5;">· Demain : Jour ${nextDay}</span></div>
-  <ul class="checklist">${items}</ul>${wn}${btnRow('s')}`;
-}
-
-// ────── DEVOIRS ──────
-function bodyDevoirs(){
-  const d=D.d;
-  const lvl=DEV_LVL[Math.min(d.lv,DEV_LVL.length-1)]||DEV_LVL[DEV_LVL.length-1];
-  const done=d.chk[0];
-  return `<div class="sep"></div>
-  <div class="mission-line">${lvl.d}</div>
-  <div class="fg">
-    <label class="flbl">Devoir du jour</label>
-    <input class="finput" value="${d.name||''}" placeholder="Nom du devoir..."
-      oninput="D.d.name=this.value;save();"/>
-  </div>
-  <ul class="checklist">
-    <li class="cli${done?' chk':''}" onclick="toggleChk('d',0)">
-      <div class="cli-box">${done?'✓':''}</div>
-      <span class="cli-lbl">Devoir terminé</span>
-    </li>
-  </ul>
-  ${btnRow('d')}`;
-}
-
-// ────── SHARED ──────
-function btnRow(dom){
-  return `<div class="actions">
-    <button class="btn btn-r" onclick="validate('${dom}','reussi')">Réussi</button>
-    <button class="btn btn-m" onclick="validate('${dom}','minimum')">Minimum</button>
-    <button class="btn btn-x" onclick="validate('${dom}','rate')">Raté</button>
+    <div class="prog-dots">${dots}<span class="prog-frac">${prog}/3</span></div>
   </div>`;
 }
 
-function vBox(status,extra){
-  const m={
-    reussi: {cls:'reussi', t:'✦ Réussi — +20 XP'},
-    minimum:{cls:'minimum',t:'○ Minimum accompli — +5 XP'},
-    rate:   {cls:'rate',   t:'✕ Raté — −1 point'},
-  }[status]||{cls:'rate',t:'✕'};
-  return `<div class="sep"></div><div class="v-box ${m.cls}">${m.t}${extra||''}</div>`;
+function actionBtns(domain) {
+  return `<div class="act-btns">
+    <button class="act-btn btn-ok"  onclick="setResult('${domain}','reussi')">✓ Réussi</button>
+    <button class="act-btn btn-mn"  onclick="setResult('${domain}','minimum')">◎ Minimum</button>
+    <button class="act-btn btn-fl"  onclick="setResult('${domain}','rate')">✗ Raté</button>
+  </div>`;
 }
 
-// ════════════════════════════════
-//  PARAMÈTRES
-// ════════════════════════════════
-
-function toggleStg(){
-  const p=document.getElementById('stgPanel');
-  p.classList.toggle('open');
-  if(p.classList.contains('open')){
-    document.getElementById('s-book').value=D.l.book||'';
-    document.getElementById('s-page').value=D.l.page||0;
-    document.getElementById('s-total').value=D.l.total||'';
-    document.getElementById('s-snack').value=D.cfg.snack||'09:00';
-    document.getElementById('s-dinner').value=D.cfg.dinner||'18:45';
-    document.getElementById('s-devoir').value=D.d.name||'';
-  }
+function resultRow(status, domain) {
+  const labels = { reussi:'✓ Réussi', minimum:'◎ Minimum fait', rate:'✗ Raté' };
+  const cls    = { reussi:'ok', minimum:'mn', rate:'fl' }[status];
+  return `<div class="result-row ${cls}">
+    <span>${labels[status]}</span>
+    <button class="edit-btn" onclick="undoResult('${domain}')">Modifier</button>
+  </div>`;
 }
 
-function saveStg(){
-  D.l.book  =document.getElementById('s-book').value.trim();
-  D.l.page  =parseInt(document.getElementById('s-page').value)||0;
-  D.l.total =parseInt(document.getElementById('s-total').value)||0;
-  D.cfg.snack =document.getElementById('s-snack').value||'09:00';
-  D.cfg.dinner=document.getElementById('s-dinner').value||'18:45';
-  D.d.name  =document.getElementById('s-devoir').value.trim();
-  save();
-  document.getElementById('stgPanel').classList.remove('open');
-  renderAll();
-  toast('Enregistré');
+function setCardClass(id, status) {
+  const el = document.getElementById(id);
+  el.className = 'dcard' + (status==='reussi'?' s-ok':status==='minimum'?' s-mn':status==='rate'?' s-fl':'');
 }
 
-function exportData(){
-  const b=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(b);
-  a.download='serments_'+todayStr()+'.json';a.click();
+function esc(s) { return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+// ─── Check toggles ───────────────────────────────
+function toggleCheck(domain, key) {
+  if (D.domains[domain].todayStatus) return;
+  if (domain === 'nutrition') { D.nutrition.checks[key] = !D.nutrition.checks[key]; save(); renderNutrition(); }
+}
+function toggleExercise(day, idx) {
+  const dm = D.domains.sport;
+  if (dm.todayStatus) return;
+  const k = `${day}_${idx}`;
+  D.sport.checks[k] = !D.sport.checks[k];
+  save(); renderSport();
+}
+function updateBook() {
+  const name = document.getElementById('lec-book'); if (name) D.lecture.bookName = name.value;
+  const pg   = document.getElementById('lec-page'); if (pg)   D.lecture.currentPage = parseInt(pg.value)||0;
+  const tot  = document.getElementById('lec-total'); if (tot)  D.lecture.totalPages  = parseInt(tot.value)||0;
+  save(); renderLecture();
 }
 
-function handleImport(e){
-  const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>{try{D=JSON.parse(ev.target.result);save();renderAll();toast('Importé');}catch{toast('Erreur fichier');}};
-  r.readAsText(f);
+// ═══════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════
+function openSettings() {
+  document.getElementById('sov').classList.add('open');
+  document.getElementById('sBookName').value    = D.lecture.bookName || '';
+  document.getElementById('sBookCurrent').value = D.lecture.currentPage || 0;
+  document.getElementById('sBookTotal').value   = D.lecture.totalPages || 0;
+  document.getElementById('sSnack').value       = D.nutrition.snackTime || '09:00';
+  document.getElementById('sDinner').value      = D.nutrition.dinnerTime || '18:45';
+  const tok = localStorage.getItem('gh_token')||'';
+  document.getElementById('sToken').value = tok ? '••••••••••••••••' : '';
+  if (tok) setSync('Token configuré', true);
+  else setSync('Aucun token — sync désactivée', false, true);
+}
+function closeSettings() { document.getElementById('sov').classList.remove('open'); }
+function saveSettings() {
+  D.lecture.bookName    = document.getElementById('sBookName').value;
+  D.lecture.currentPage = parseInt(document.getElementById('sBookCurrent').value)||0;
+  D.lecture.totalPages  = parseInt(document.getElementById('sBookTotal').value)||0;
+  D.nutrition.snackTime  = document.getElementById('sSnack').value;
+  D.nutrition.dinnerTime = document.getElementById('sDinner').value;
+  const tok = document.getElementById('sToken').value;
+  if (tok && !tok.includes('•')) localStorage.setItem('gh_token', tok);
+  save(); closeSettings(); renderAll();
+  toast('Paramètres enregistrés');
+}
+function resetDomain() {
+  const d = prompt('Quel domaine réinitialiser ? (nutrition / lecture / sport / devoirs)');
+  if (!d || !D.domains[d]) return;
+  if (!confirm(`Réinitialiser ${d} complètement ?`)) return;
+  D.domains[d] = { level:1, progress:0, todayStatus:null };
+  if (d === 'sport') D.domains.sport.dayAB = 'A';
+  save(); renderAll(); toast('Domaine réinitialisé');
 }
 
-// ════════════════════════════════
+// ═══════════════════════════════════════════════
 //  TOAST
-// ════════════════════════════════
-
-function toast(msg,type){
-  const w=document.getElementById('toasts');
-  const el=document.createElement('div');
-  el.className='toast '+(type||'');el.textContent=msg;
-  w.appendChild(el);setTimeout(()=>el.remove(),3200);
+// ═══════════════════════════════════════════════
+function toast(msg, type) {
+  const c = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type==='red'?' red':type==='green'?' green':'');
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
 }
 
-// ════════════════════════════════
+// Close settings on overlay click
+document.getElementById('sov').addEventListener('click', e => {
+  if (e.target === document.getElementById('sov')) closeSettings();
+});
+
+// ═══════════════════════════════════════════════
 //  INIT
-// ════════════════════════════════
-dailyReset();
+// ═══════════════════════════════════════════════
+checkDailyReset();
 renderAll();
+// Try sync from GitHub on load
+if (getToken()) syncFromGitHub().catch(()=>{});
 </script>
 </body>
 </html>
