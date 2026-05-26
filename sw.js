@@ -1,4 +1,4 @@
-const CACHE = 'ascension-v2';
+const CACHE = 'ascension-v3';
 const URLS  = [
   '/ascension-protocol/',
   '/ascension-protocol/index.html',
